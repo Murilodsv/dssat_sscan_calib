@@ -1,0 +1,5 @@
+Improvements for calibration procedure:
+
+- global minimum threshold                      (to stop iterations earlier when a threshold is achieved)
+- write best set of parameters in .cul and .eco (link to https://github.com/Murilodsv/R-scripts/tree/master/dspar_sccan_f)
+- write sim x obs values for the best set       (better assess final results)
