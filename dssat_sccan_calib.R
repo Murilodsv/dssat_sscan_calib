@@ -18,7 +18,8 @@
 #--- 'repository'/db/GOGO.WTH         (Weather file for this example)
 
 #--- This example will optimize the tillering coefficients of DSSAT/CANEGRO for
-#--- different varieties using the variety Nco376 as base
+#--- different sugarcane varieties using the variety Nco376 as base
+#--- Results will be placed in the 'results' of this folder
 
 #--------------------#
 #--- Script Setup ---#
@@ -34,9 +35,13 @@ savepng   = T                             # save optimization dev to png file?
 #--------------------------#
 #--- Optimization Setup ---#
 #--------------------------#
-op_reltol     = 1e-5          # Relative convergence tolerance
-method.opt    = "Nelder-Mead" # More options can be set for other methds (see ?optim)
-nopt          = 15            # Number of optimization repetitions (repeat process with randomly different initial conditions)
+op_reltol     = 0.01          # Relative convergence tolerance
+method.opt    = "Nelder-Mead" # More options can be set for other methods (see ?optim())
+
+#--- Number of optimization repetitions 
+#--- A new set of initial parameters is randomly pick for each repetition  
+#--- The higher this number, the higher is the probability to achieve global minimum objective
+nopt          =  5            # We set 5 for the sake of this example, but a higher must be used for serious calibration
 
 #--- Observed data used for calibration
 #--- Note: here we are using one variable but you can add as many as needed
@@ -44,10 +49,10 @@ nopt          = 15            # Number of optimization repetitions (repeat proce
 used.data     = "Tillering_n_m-2"
 
 #--- model output to be compared with observation
-sscan_out     = "t.ad" # is possible to add as many outputs as needed
+sscan_out     = "t.ad" # is possible to add as many outputs as needed with minor change in the code
 
 #--- Statistical index used as objective function by the optimization (for different indexes see mperf())
-outidx      = "rmse" # Using Root Mean Squared Error (RMSE). See mperf() function for more options
+outidx        = "rmse" # Using Root Mean Squared Error (RMSE). See mperf() function for more options
 
 #--- Load Functions (~/bin/) 
 invisible(sapply(list.files(path = paste0(wd,"/bin/"),full.names = T),
@@ -104,7 +109,7 @@ for(cv in l_cv){
   }
   
   #--- write a temporary file with optimization progression
-  write.csv(obj_df,file = paste(wd,"/optim_dev.csv",sep=""),row.names = F)
+  write.csv(obj_df,file = paste(wd,"/results/optim_dev.csv",sep=""),row.names = F)
   
   #--- read observed data for cultivar (cv)
   obs_df      = data.frame(cv  = cv,
@@ -145,8 +150,8 @@ for(i in 1:nopt){
   message(paste("End of optimization for ",cv,sep=""))
   
   #--- write optimization parameters
-  opt_par = read.csv(paste(wd,"/optim_dev.csv",sep=""))
-  write.csv(opt_par,file = paste(wd,"/optim_dev_",cv,".csv",sep=""),row.names = F)
+  opt_par = read.csv(paste(wd,"/results/optim_dev.csv",sep=""))
+  write.csv(opt_par,file = paste(wd,"/results/optim_dev_",cv,".csv",sep=""),row.names = F)
   
   #--- save to png file (there is room for using ggplot here)
   if(savepng){

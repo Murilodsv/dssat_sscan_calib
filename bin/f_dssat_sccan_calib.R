@@ -22,6 +22,7 @@ dssat_sccan_calib = function(svalue){
   calib$pvalue[calib$Calibrate] = svalue * (calib$Calib_range_max[calib$Calibrate] - calib$Calib_range_min[calib$Calibrate]) + calib$Calib_range_min[calib$Calibrate]
   
   #--- cultivar ID to follow-up optimization
+  cat("\014")
   message(paste("Calibrating cultivar: ",calib_id,sep=""))
   message("")
   
@@ -49,7 +50,7 @@ dssat_sccan_calib = function(svalue){
       if(svalue[i] > 1 | svalue[i] < 0){
         
         #--- msg
-        message(paste("Warning: Parameter ",calib$Par_orig[calib$Calibrate][i], " is out of min and max range (Objective increased)",sep = ""))
+        message(paste("Warning: Parameter ",calib$Par_orig[calib$Calibrate][i], " is out of min and max range (Objective Penalized)",sep = ""))
         
         #--- Increase objective function 
         penalize = T
@@ -164,7 +165,7 @@ dssat_sccan_calib = function(svalue){
     model_perf = mperf(sim,obs,sscan_out,F)
     
     perf_df = data.frame(cv = calib_id,model_perf)
-    write.csv(perf_df, file = paste(wd,"/perf_",calib_id,".csv",sep=""),row.names = F)
+    write.csv(perf_df, file = paste(wd,"/results/perf_",calib_id,".csv",sep=""),row.names = F)
     
     plot(plant[,sscan_out]~plant[,"dap"],
          type = "l",
@@ -196,7 +197,7 @@ dssat_sccan_calib = function(svalue){
   
   if(plotdev){
     
-    it_before = read.csv(file = paste(wd,"/optim_dev.csv",sep=""))
+    it_before = read.csv(file = paste(wd,"/results/optim_dev.csv",sep=""))
     
     obj_df = data.frame(n = (max(it_before$n)+1),obj = objective,inbounds = T)
     
@@ -228,7 +229,7 @@ dssat_sccan_calib = function(svalue){
     plot(it_after$obj~it_after$n, type = "l",ylab = outidx,xlab = "Number of iterations", ylim = c(0,max(it_after$obj)))
     lines(c(min(it_after$obj),min(it_after$obj))~c(-1000,max(it_after$n)*1000), lty = 3,col = "red")
     
-    write.csv(it_after,file = paste(wd,"/optim_dev.csv",sep=""),row.names = F)
+    write.csv(it_after,file = paste(wd,"/results/optim_dev.csv",sep=""),row.names = F)
     
   }
   
