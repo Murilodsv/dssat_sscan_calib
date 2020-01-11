@@ -58,6 +58,9 @@ outidx        = "rmse" # Using Root Mean Squared Error (RMSE). See mperf() funct
 invisible(sapply(list.files(path = paste0(wd,"/bin/"),full.names = T),
                                function(x) source(x)))
 
+#--- Create results folder
+dir.create(paste0(wd,"/results"), showWarnings = FALSE)
+
 #--- Reading plant observations and PlantGro Header
 obs_raw   = read.csv(paste0(wd,"/db/gogo_field_data.csv"))
 pgro_head = read.csv(paste0(wd,"/db/PlantGro_Head.csv"))
