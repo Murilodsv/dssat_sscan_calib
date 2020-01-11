@@ -59,8 +59,8 @@ dssat_sccan_calib = function(svalue){
   
   
   #--- Read model parameters MASTER files
-  par_cul_file  = readLines(paste(wd,"/SCCAN047_M.CUL",sep = ""))
-  par_eco_file  = readLines(paste(wd,"/SCCAN047_M.ECO",sep = ""))
+  par_cul_file  = readLines(paste(wd,"/templates/SCCAN047_M.CUL",sep = ""))
+  par_eco_file  = readLines(paste(wd,"/templates/SCCAN047_M.ECO",sep = ""))
   rep_line      = 4 # line of file where the replacement will be done
   
   #--- re-build cultivar file (.CUL)
@@ -69,7 +69,7 @@ dssat_sccan_calib = function(svalue){
   for(ftype in l_ftype){
     
     #---Read model parameters MASTER file
-    p_file = readLines(paste(wd,"/SCCAN047_M",ftype,sep = ""))
+    p_file = readLines(paste(wd,"/templates/SCCAN047_M",ftype,sep = ""))
     
     #--- list of parameters
     l_rp = unique(calib$Rep_ID[calib$File == ftype])

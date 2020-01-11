@@ -61,7 +61,7 @@ pgro_head = read.csv(paste0(wd,"/db/PlantGro_Head.csv"))
 pgro_names  = pgro_head$R_head
 
 #--- prepare batch call
-bfile = readLines(paste(wd,"/DSSBatch_Master.v47",sep=""))
+bfile = readLines(paste(wd,"/templates/DSSBatch_Master.v47",sep=""))
 bfile[4] = gsub("<calib_xfile>",xfile,bfile[4])
 
 #--- write batch in Crop folder

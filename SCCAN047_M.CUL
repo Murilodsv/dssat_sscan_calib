@@ -1,4 +1,0 @@
-!SUGARCANE CALIBRATION (CULTIVAR FILE.CUL)
-!MURILO VIANNA (JUN-2018)
-@VAR#  VAR-NAME........ EXPNO   ECO#       MaxPARCE          APFMX       STKPFMAX           SUCA           TBFT          LFMAX       MXLFAREA       MXLFARNO            PI1            PI2        PSWITCH       TTPLNTEM       TTRATNEM      CHUPIBASE   TT_POPGROWTH        POPTT16           TAR0         TDELAY           LER0           SER0      LG_AMBASE        AQP_UP5
-CL0001 CALIBRATION            CL0001 <p1> <p2> <p3> <p4> <p5> <p6> <p7> <p8> <p9> <p10> <p11> <p12> <p13> <p14> <p15> <p16> <p17> <p18> <p19> <p20> <p21> <p22> 
