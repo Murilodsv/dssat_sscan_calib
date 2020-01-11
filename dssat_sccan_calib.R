@@ -1,30 +1,61 @@
 #---------------------------------#
 #--- DSSAT CANEGRO Calibration ---#
-#--- Murilo Vianna (Jun-2018)  ---#
 #---------------------------------#
 
-#--- Description: R-Script for dssat/canegro calibration (.CUL and .ECO) 
-#--- (this is not GLUE or GenCalc) 
+#--- Goal: Calibrate crop parameters of DSSAT/CANEGRO 
+#---       (this is not GLUE or GenCalc)
 
-#--- Script Setup
-wd        = "C:/Users/PC-600/Dropbox (Farmers Edge)/MuriloVianna/DB/cultivars/dssat_calib"
-ds_v      = 47
-crop      = "Sugarcane"
-xfile     = "SCGO0001.SCX" # IMPORTANT MAKE SURE THE CULTIVAR SELECT IN THE X FILE IS THE SAME AS IN THE .CUL AND .ECO MASTER FILE!
-parnm     = "SCCAN047"
-obs_raw   = read.csv(paste(wd,"/gogo_field_data.csv",sep=""))
-pgro_head = read.csv(paste(wd,"/PlantGro_Head.csv",sep=""))
-pdssat    = F
-savepng   = T # save optimization dev to png file?
+#--- History
+#--- Jun-2018: Created (Murilo Vianna)
+#--- Jan-2020: Updated for new CANEGRO version (Murilo Vianna)
 
-#--- optimization
-#--- Relative convergence tolerance
-op_reltol = 1e-5
+#----------------------------#
+#--- Running this example ---#
+#----------------------------#
 
-#--- more options can be set for other methds (see ?optim)
+#--- Before start copy the below files to DSSATv47/Sugarcane folder:
+#--- 'repository'/db/SCGO0001.SCX     (X file for this example)
+#--- 'repository'/db/GOGO.WTH         (Weather file for this example)
 
-#--- load functions
-source(paste(wd,"/f_dssat_sccan_calib.R",sep=""))
+#--- This example will optimize the tillering coefficients of DSSAT/CANEGRO for
+#--- different varieties using the variety Nco376 as base
+
+#--------------------#
+#--- Script Setup ---#
+#--------------------#
+wd        = "C:/Murilo/dssat_sscan_calib" # Working directory (repository)            
+ds_v      = 47                            # DSSAT version
+crop      = "Sugarcane"                   # Crop name
+xfile     = "SCGO0001.SCX"                # X file
+parnm     = "SCCAN047"                    # Model name SCCAN047 = CANEGRO
+pdssat    = F                             # Print DSSAT echo while running
+savepng   = T                             # save optimization dev to png file?
+
+#--------------------------#
+#--- Optimization Setup ---#
+#--------------------------#
+op_reltol     = 1e-5          # Relative convergence tolerance
+method.opt    = "Nelder-Mead" # More options can be set for other methds (see ?optim)
+nopt          = 15            # Number of optimization repetitions (repeat process with randomly different initial conditions)
+
+#--- Observed data used for calibration
+#--- Note: here we are using one variable but you can add as many as needed
+#---  As long as the model outputs that...
+used.data     = "Tillering_n_m-2"
+
+#--- model output to be compared with observation
+sscan_out     = "t.ad" # is possible to add as many outputs as needed
+
+#--- Statistical index used as objective function by the optimization (for different indexes see mperf())
+outidx      = "rmse" # Using Root Mean Squared Error (RMSE). See mperf() function for more options
+
+#--- Load Functions (~/bin/) 
+invisible(sapply(list.files(path = paste0(wd,"/bin/"),full.names = T),
+                               function(x) source(x)))
+
+#--- Reading plant observations and PlantGro Header
+obs_raw   = read.csv(paste0(wd,"/db/gogo_field_data.csv"))
+pgro_head = read.csv(paste0(wd,"/db/PlantGro_Head.csv"))
 
 #--- PlantGro header
 pgro_names  = pgro_head$R_head
@@ -38,7 +69,7 @@ write(bfile,file = paste("C:/DSSAT",ds_v,"/",crop,"/","DSSBatch.v",ds_v,sep = ""
 
 #--- Read parameters set up
 par_set   = read.csv(paste(wd,"/dssat_canegro_calib_par.csv",sep=""))
-calib = par_set
+calib     = par_set
 
 l_cv = unique(obs_raw$Cultivar)
 
@@ -51,9 +82,6 @@ for(cv in l_cv){
   
   #--- current cultivar
   calib_id  = cv
-  
-  #--- Number of iterations
-  nopt = 15
 
   message(paste("Start of optimization for ",cv,sep=""))
   
@@ -75,38 +103,24 @@ for(cv in l_cv){
     obj_df = cbind(obj_df,df)
   }
   
+  #--- write a temporary file with optimization progression
   write.csv(obj_df,file = paste(wd,"/optim_dev.csv",sep=""),row.names = F)
   
   #--- read observed data for cultivar (cv)
-  crop_height = data.frame(cv  = cv,
-                           dap = obs_raw$DAP[obs_raw$Cultivar==calib_id & obs_raw$Type=="Stalk_height_m"],
-                           obs = obs_raw$Value[obs_raw$Cultivar==calib_id & obs_raw$Type=="Stalk_height_m"])
+  obs_df      = data.frame(cv  = cv,
+                           dap = obs_raw$DAP[obs_raw$Cultivar==calib_id & obs_raw$Type==used.data],
+                           obs = obs_raw$Value[obs_raw$Cultivar==calib_id & obs_raw$Type==used.data])
   
-  stalk_fresh = data.frame(cv  = cv,
-                           dap = obs_raw$DAP[obs_raw$Cultivar==calib_id & obs_raw$Type=="Stalk_Fresh_Mass_t_ha-1"],
-                           obs = obs_raw$Value[obs_raw$Cultivar==calib_id & obs_raw$Type=="Stalk_Fresh_Mass_t_ha-1"])
-  
-  stalk_till  = data.frame(cv  = cv,
-                           dap = obs_raw$DAP[obs_raw$Cultivar==calib_id & obs_raw$Type=="Tillering_n_m-1"],
-                           obs = obs_raw$Value[obs_raw$Cultivar==calib_id & obs_raw$Type=="Tillering_n_m-1"])
-  
-  stalk_pol   = data.frame(cv  = cv,
-                           dap = obs_raw$DAP[obs_raw$Cultivar==calib_id & obs_raw$Type=="POL_%"],
-                           obs = obs_raw$Value[obs_raw$Cultivar==calib_id & obs_raw$Type=="POL_%"])
-  
-  #--- update observed data for calibration (cv)
-  obs_df      = crop_height
-  
-  #--- model output used for calibraton (same as pgro_names())
-  sscan_out   = "shtd"
-  
-  #--- Statistical index used as objective function by the optimization (for different indexes see mperf())
-  outidx      = "rmse" # Using Root Mean Squared Error (RMSE)
   
 for(i in 1:nopt){
   
-  #--- Optimize (using default - Nelder_Mead)
-  optim(svalue,dssat_sccan_calib,control = list(reltol = op_reltol))
+  #--------------------#
+  #--- Optimization ---#
+  #--------------------#
+  
+  #--- Optimize 
+  optim(svalue,dssat_sccan_calib,control = list(reltol = op_reltol),
+        method = method.opt)
   
   #--- restart iniial conditions (try to fall on global minimum)
   new_val = rnorm(1000,0.5,0.25)
@@ -134,7 +148,7 @@ for(i in 1:nopt){
   opt_par = read.csv(paste(wd,"/optim_dev.csv",sep=""))
   write.csv(opt_par,file = paste(wd,"/optim_dev_",cv,".csv",sep=""),row.names = F)
   
-  #--- save to png file
+  #--- save to png file (there is room for using ggplot here)
   if(savepng){
     png(paste(wd,"/optimization_",calib_id,".png",sep=""),
         units="in", 
