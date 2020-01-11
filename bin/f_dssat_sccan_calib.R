@@ -151,7 +151,7 @@ dssat_sccan_calib = function(svalue){
   
   if(plotperf){
     
-    png(paste(wd,"/perf_",calib_id,".png",sep=""),
+    png(paste(wd,"/results/perf_",calib_id,".png",sep=""),
         units="in", 
         width=24, 
         height=12, 

@@ -41,7 +41,7 @@ method.opt    = "Nelder-Mead" # More options can be set for other methods (see ?
 #--- Number of optimization repetitions 
 #--- A new set of initial parameters is randomly pick for each repetition  
 #--- The higher this number, the higher is the probability to achieve global minimum objective
-nopt          =  5            # We set 5 for the sake of this example, but a higher must be used for serious calibration
+nopt          =  1            # We set 5 for the sake of this example, but a higher must be used for serious calibration
 
 #--- Observed data used for calibration
 #--- Note: here we are using one variable but you can add as many as needed
@@ -144,7 +144,9 @@ for(i in 1:nopt){
     }
   }
   
-  svalue = new_val
+  #--- Reinit
+  if(i != nopt){svalue = new_val}
+  
 }
   
   message(paste("End of optimization for ",cv,sep=""))
@@ -155,7 +157,7 @@ for(i in 1:nopt){
   
   #--- save to png file (there is room for using ggplot here)
   if(savepng){
-    png(paste(wd,"/optimization_",calib_id,".png",sep=""),
+    png(paste(wd,"/results/optimization_",calib_id,".png",sep=""),
         units="in", 
         width=24, 
         height=12, 
@@ -173,7 +175,7 @@ for(i in 1:nopt){
   svalue_df =  opt_par[opt_par$obj==min(opt_par$obj[opt_par$inbounds]),as.character(calib$Par_orig[calib$Calibrate])]
   
   if(length(svalue_df[,as.character(calib$Par_orig[calib$Calibrate][1])]) > 1){
-    #---use pick up the median minimun values
+    #--- pick up the median minimun values
     svalue_df = sapply(as.character(calib$Par_orig[calib$Calibrate]),function(x) median(svalue_df[,x]))
   }
   
@@ -185,7 +187,7 @@ for(i in 1:nopt){
   #--- check best parameters performance
   plotperf = T # plot sim x obs?
   plotdev  = F # follow-up optimization?
-  dssat_sccan_calib(svalue)
+  dssat_sccan_calib(t(svalue))
 
 }
 
