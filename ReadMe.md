@@ -3,7 +3,6 @@
 Murilo Vianna (Jun-2018)
 ----------------------------------
 
-
 # Main Goal:
 Calibrate .CUL and .ECO crop parameters of DSSAT/CANEGRO (PBM)
 
@@ -11,6 +10,9 @@ Calibrate .CUL and .ECO crop parameters of DSSAT/CANEGRO (PBM)
 It uses the general purpose optimization function "optim()" embedded in R environment. User can set up the optimization method, objective function, observed data, and parameters to be calibrated. Charts and tables are provided as outputs with calibrated parameters in folder 'results'.
 
 ![alt text](https://github.com/Murilodsv/dssat_sscan_calib/blob/master/framework.png)
+
+# Warning:
+This subroutine will replace your .CUL and .ECO, so please make sure you backed up your original coefficients before using it.  
 
 # Example Run:
 An example is already set in the table dssat_canegro_calib_par.csv and file dssat_sccan_calib.R
