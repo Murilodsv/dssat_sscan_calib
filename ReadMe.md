@@ -26,3 +26,12 @@ Specify in the column 'Calibrate' which parameter will be calibrated by writing 
 In Columns 'Init_values' 'Calib_range_min'	'Calib_range_max' specify the initial parameters values, the minimum and maximum range.
 
 2) Open dssat_sccan_calib.R and follow the comented instructions
+
+# Sample Results:
+
+Optimization progress of RMSE
+
+![opmin_progress](https://github.com/Murilodsv/dssat_sscan_calib/blob/master/results/optimization_CTC2.png)
+
+Best fit results
+![bf_res](https://github.com/Murilodsv/dssat_sscan_calib/blob/master/results/perf_CTC2.png)
